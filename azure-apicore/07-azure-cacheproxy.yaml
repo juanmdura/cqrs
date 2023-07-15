@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cacheproxy-cosmosdb
+  namespace: default
+  labels:
+    app: cacheproxy-cosmosdb
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: cacheproxy-cosmosdb
+  template:
+    metadata:
+      labels:
+        app: cacheproxy-cosmosdb
+    spec:
+      containers:
+      - name: cacheproxy-cosmosdb
+        image: arqregistry.azurecr.io/cacheproxy-cosmosdb:v1
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: API_CORE_ENDPOINT
+            value: http://products.arq.customer.corp:8080/api/products
+          - name: AZURE_COSMOSDB_URI
+            value: https://saci-arq-cosmosdb.documents.azure.com:443/
+          - name: AZURE_COSMOSDB_KEY
+            valueFrom:
+              secretKeyRef:
+                name: apicore
+                key: azure-cosmosdb-key
+          - name: AZURE_COSMOSDB_DATABASE
+            value: Products
+        ports:
+          - containerPort: 8080
+        resources:
+          limits:
+            memory: "256Mi"
+          requests:
+            memory: "150Mi"
+      imagePullSecrets:
+      - name: arqregistry

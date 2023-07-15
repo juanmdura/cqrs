@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cacheproxy-cosmosdb
+  namespace: default
+  labels:
+    app: cacheproxy-cosmosdb
+spec:
+  type: ClusterIP
+  selector:
+    app: cacheproxy-cosmosdb
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
